@@ -1,6 +1,9 @@
 var express = require('express')
-    ,router = express.router();
+    ,router = express.Router();
 
-router.get('/', function(){
-    
+router.get('/', (req,res) => {
+    console.log('In Monitoring');
+    res.send("It's Working!!!!:-)");
 });
+
+module.exports = router;
