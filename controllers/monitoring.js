@@ -1,6 +1,6 @@
 var express = require('express')
-    ,router = express.router();
+    ,router = express.Router();
 
 router.get('/', function(){
-    
+    console.log('Pass in monitor');
 });
