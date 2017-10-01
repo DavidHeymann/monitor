@@ -1,36 +1,27 @@
 var express = require('express')
-<<<<<<< HEAD
-    ,router = express.Router();
-
-router.get('/', function(){
-    console.log('Pass in monitor');
-=======
     ,router = express.Router()
-    ,nodeSsh = require('node-ssh');
+    //,nodeSsh = require('node-ssh')
+    ,exec = require('ssh-exec');
 
-router.get('/', (req,res) => {
-    console.log('In Monitoring');
-    var ssh = new nodeSsh();
-    ssh.connect({
-        host: '52.138.150.180',
-        username: 'monitor',
-        privatekey: '/home/david/.ssh/id_rsa'
+
+router.get('/', (req, res, next)=>{
+    exec("vmstat 1 2|tail -1|awk '{print 100-$15}'", 
+    'monitor@52.138.150.180', function (err, stdout, stderr, req) {
+       console.log('err: '+ err +', stdout: '+ stdout+', stderr: '+stderr)
+       res.locals.cpu = stdout || "not cpu";
+       next()
     })
-    .then(function(){
-    /* ssh.execCommand(`echo $[100-$(vmstat 1 2|tail -1|awk '{print $15}')]`).then(function(result) {
-        console.log('STDOUT: ' + result.stdout+'%')
-        console.log('STDERR: ' + result.stderr)
-        res.send('STDOUT: ' + result.stdout+'%')
-      }) */
-      ssh.execCommand("echo $[100-$(vmstat 1 2|tail -1|awk '{print $15}')]", { cwd:'/var/www' }).then(function(result) {
-        console.log('STDOUT: ' + result.stdout)
-        console.log('STDERR: ' + result.stderr)
-      }, function(er){
-            console.log('somthing error!!');
-      })
+},(req ,res, next)=>{
+    exec("free | grep Mem | awk '{print ($3+$6)*100/$2}'", 
+    'monitor@52.138.150.180', function (err, stdout, stderr, req) {
+       console.log('err: '+ err +', stdout: '+ stdout+', stderr: '+stderr)
+       res.locals.ram = stdout || "not ram";
+       next()
     })
-    
->>>>>>> c31bf2fff89abb93063a7959bf4085cd60d9782c
-});
+},(req, res)=>{
+    console.log('send')
+    res.send('cpu: '+res.locals.cpu+ ". ram: "+res.locals.ram)
+})
+
 
 module.exports = router;
