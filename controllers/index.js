@@ -5,6 +5,7 @@ module.exports = (app) => {
     app.get('/', function(req,res){
         console.log('In Index')
         //res.send("it's work")
+        
         res.redirect('monitoring/');
     })
 }
