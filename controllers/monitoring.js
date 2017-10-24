@@ -1,7 +1,6 @@
 var express = require('express')
     ,osUtils = require('os-utils')
     ,router = express.Router()
-    //,nodeSsh = require('node-ssh')
     ,exec = require('ssh-exec');
 
 

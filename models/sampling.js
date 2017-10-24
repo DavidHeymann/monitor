@@ -2,10 +2,10 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var samplingSchema = new Schema({
-  id: String,
-  idServer:  String,
-  RAM: String,
-  CPU:  String
+  idServer:  [{type: Schema.Types.ObjectId, ref: 'server'}],
+  ram: String,
+  cpu:  String,
+  date: {type: Date, default: Date.now}
 });
 
 var Sampling = mongoose.model('Sampling', samplingSchema);
