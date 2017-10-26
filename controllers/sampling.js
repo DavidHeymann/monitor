@@ -31,7 +31,7 @@ router.get('/listSampling', function(req,res){
     });
 });
 
-router.post('/getSamplingsByIdServer', async function(req, res){
+router.post('/getSamplingsByIpServer', async function(req, res){
     idServer =  await server.findOne({'ipAdreess': req.body.ipAdreess},(err, server)=>{
         if(err) return console.error(err);
 
