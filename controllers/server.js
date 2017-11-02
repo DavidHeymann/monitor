@@ -4,35 +4,49 @@ var express = require('express')
 
 
 router.post('/create', function(req ,res){
-    var newServer = new server({
-        hostName: req.body.hostName,
-        ipAdreess: req.body.ipAdreess,
-        userName:  req.body.userName
+
+    server.create(req.body.hostName, 
+                  req.body.ipAdreess, 
+                  req.body.userName, 
+                  function(err, server){
+                      if(err)  res.status(500).send(err.message);
+                              
+                      res.status(200).type('json').send(server);
+                  })      
+});
+
+router.get('/all', function(req,res){
+    server.getAll(function(err, servers){
+        if(err)  res.status(500).send(err.message);
+        
+        res.status(200).type('json').send(servers);
     })
-
-    newServer.save(function(err){
-        if(err) throw err;
-
-        res.send('The server save')
-    });
-    
 });
 
-router.get('/listServers', function(req,res){
-    server.find(function(err, servers){
-        if(err) return console.error(err);
-
-        res.send(servers);
-    });
+router.get('/:ipServer', function(req, res){
+    server.getServerByIp(req.params.ipServer, (err, server)=>{
+        if(err)  res.status(500).send(err.message);
+        
+        res.status(200).json(servers);
+    })
 });
 
-router.post('/getServerByIp', function(req, res){
-    server.findOne({'ipAdreess': req.body.ipAdreess},(err, server)=>{
-        if(err) return console.error(err);
+router.put('/:ipServer', (req, res)=>{
+    server.update(req.params.ipServer, req.body.ipAdreess, req.body.userName, (err, server)=>{
+        if(err)  res.status(500).send(err.message);
+        
+        res.status(200).json(server);
+    })
+})
 
-        res.send(server);
-    });
-});
+router.delete('/:ipServer', (req, res)=>{
+    server.remove(req.params.ipServer, (err, server)=>{
+        if(err)  res.status(500).send(err.message);
+        
+        res.status(200).json(server);
+    })
+})
+
 
 
 module.exports= router;

@@ -5,44 +5,53 @@ var express = require('express')
 ,mongoose = require('mongoose');
 
 router.post('/create', async function(req ,res){
-    var newSampling =  new sampling({
-        idServer:  await server.findOne({'ipAdreess': req.body.ipAdreess},(err, server)=>{
-            if(err) return console.error(err);
-           
-            return mongoose.Types.ObjectId(server.id);
-        }),
-        ram: req.body.ram,
-        cpu: req.body.cpu
+    idServer = await Types.ObjectId((server.getServerByIp(req.body.ipAdreess)).id)
+
+    sampling.create(idServer, req.body.ram, req.body.cpu, (err, sampling)=>{
+        if(err) return res.status(500).send(err.message);
+
+        res.status(200).json(sampling);
     })
-
-    newSampling.save(function(err){
-        if(err) throw err;
-
-        res.send('The sampling saved')
-    });
-    
 });
 
-router.get('/listSampling', function(req,res){
-    sampling.find(function(err, sampling){
-        if(err) return console.error(err);
-
-        res.send(sampling);
-    });
-});
-
-router.post('/getSamplingsByIpServer', async function(req, res){
-    idServer =  await server.findOne({'ipAdreess': req.body.ipAdreess},(err, server)=>{
-        if(err) return console.error(err);
-
-        return mongoose.Types.ObjectId(server.id);
+router.get('/all', (req,res)=>{
+    sampling.getAll((err, samplings)=>{
+        if(err) return res.status(500).send(err.message);
+        
+        res.status(200).json(samplings);
     })
-    sampling.find({'idServer': idServer},(err, sampling)=>{
-        if(err) return console.error(err);
-
-        res.send(sampling);
-    });
 });
+
+router.get('/:ipServer', async (req, res)=>{
+    idServer = await Types.ObjectId((server.getServerByIp(req.params.ipServer)).id)
+
+    sampling.getSamplingsByIdServer(idServer, (err, samplings)=>{
+        if(err) return res.status(500).send(err.message);
+        
+        res.status(200).json(samplings);
+    })
+});
+
+router.get('/:ipServer', async (req, res)=>{
+    idServer = await Types.ObjectId((server.getServerByIp(req.params.ipServer)).id)
+
+    sampling.getSamplingsByIdServerAndTime(idServer, req.body.gtDate, req.body.ltDate, (err, samplings)=>{
+        if(err) return res.status(500).send(err.message);
+        
+        res.status(200).json(samplings);
+    })
+});
+
+router.delete('/:ipServer', (req, res)=>{
+    idServer = await Types.ObjectId((server.getServerByIp(req.params.ipServer)).id)
+
+    sampling.removeByIdServer(idServer, (err, samplings)=>{
+        if(err) return res.status(500).send(err.message);
+        
+        res.status(200).json(samplings);
+    })
+})
+
 
 
 module.exports= router;
